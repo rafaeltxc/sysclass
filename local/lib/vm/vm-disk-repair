@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: disk resize <disk-path> [level]\nRepair disk by Level\nRepair Levels: leaks (safe), all (aggressive)"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 2 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+DISK_PATH="$1"
+REPAIR_LEVEL="{$2:-none}"
+
+if [[ ! -f "$DISK_PATH" ]]; then
+  echo "Error: Disk '$DISK_PATH' not found"
+  exit 2
+fi
+
+if [[ "$REPAIR_LEVEL" != "leaks" && "$REPAIR_LEVEL" != "all" ]]; then
+  echo "Invalid repair level: $REPAIR_LEVEL"
+  echo "Valid options: leaks, all"
+  exit 3
+fi
+
+echo "Running qemu-img check -r $REPAIR_LEVEL ..."
+qemu-img check -r "$REPAIR_LEVEL" "$DISK_PATH"
+
+if [[ $? -eq 0 ]]; then
+  echo "Disk repair completed"
+  exit 0
+fi
+
+echo "qemu-img check -r reported issues"
+exit 4

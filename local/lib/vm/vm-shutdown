@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: shutdown <vm-name> <force-shutdown>\ an already defined VM\nReceives a secondary optional parameter (true/false) to force shutdown"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ -z "$1" ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+VM_NAME="$1"
+FORCE="${2:-false}"
+
+if [[ "$FORCE" == "false" ]]; then
+  if virsh shutdown "$VM_NAME"; then
+    echo "VM '$VM_NAME' has been gracefully shutdown"
+    exit 0
+  fi
+fi
+
+if [[ "$FORCE" == "true" ]]; then
+  if virsh destroy "$VM_NAME"; then
+    echo "VM '$VM_NAME' has been forced to shutdown"
+    exit 0
+  fi
+fi
+
+echo "VM '$VM_NAME' couldn't be shutdown"
+exit 2

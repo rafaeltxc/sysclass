@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: reboot <vm-name>\nReboot an an already defined VM"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+VM_NAME="$1"
+
+echo "Rebooting VM '$VM_NAME'..."
+if virsh reboot "$VM_NAME"; then
+  echo "Reboot signal sent to VM '$VM_NAME'"
+  exit 0
+fi
+
+echo "Failed to reboot VM '$VM_NAME'"
+exit 3

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: validate <xml-path>\nValidates a XML VM file"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+XML_FILE="$1"
+
+if [[ ! -f "$XML_FILE" ]]; then
+  echo "Error: XML File '$XML_FILE' not found"
+  exit 2
+fi
+
+echo "Validating XML..."
+if ! virt-xml-validate "$XML_FILE"; then
+  echo "Validation failed: XML does not conform to the expected schema"
+  exit 3
+fi
+
+echo "VM XML validated successfully from '$XML_FILE'"
+exit 0

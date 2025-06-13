@@ -1,0 +1,34 @@
+# _vm() {
+#   local -a commands path_parts
+#   local joined curcmd
+
+#   local VM_DIR=/usr/local/lib/vm
+
+#   path_parts=("${words[@]:1}")
+#   joined=$(IFS=-; echo "${path_parts[*]}")
+
+#   local files=(${(f)"$(command ls $VM_DIR/vm-* 2>/dev/null)"})
+
+#   commands=()
+#   for f in $files; do
+#     cmdpath="${f##*/}"
+#     cmdpath="${cmdpath#vm-}"
+
+#     IFS='-' read -A segments <<< "$cmdpath"
+    
+#     for i in {1..${#path_parts[@]}}; do
+#       [[ "${segments[i-1]}" == "${path_parts[i-1]}" ]] || continue 2
+#     done
+
+#     next_part="${segments[${#path_parts[@]}]}"
+#     [[ -n "$next_part" ]] && commands+="$next_part"
+#   done
+
+#   commands=(${(u)commands})
+
+#   if [[ ${#commands[@]} -gt 0 ]]; then
+#     _describe 'vm command' commands
+#   else
+#     _files
+#   fi
+# }

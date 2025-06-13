@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+msg="usage: net autostart <network> <?action>\nSets an already defined network to auto start on boot\nReceives a secondary optional parameter (true/false) to enable/disable auto start"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$msg"
+  exit 0
+fi
+
+if [[ -z "$1" ]]; then
+  echo -e "$msg"
+  exit 1
+fi
+
+NETWORK="$1"
+ACTION="${2:-true}"
+
+if [[ "$ACTION" == "true" ]]; then
+  if virsh net-autostart "$NETWORK"; then
+    echo "Network '$NETWORK' is now set to auto start"
+    exit 0
+  fi
+fi
+
+if [[ "$ACTION" == "false" ]]; then
+  if virsh net-autostart "$NETWORK" --disable; then
+    echo "Network '$NETWORK' is now not set to auto start"
+    exit 0
+  fi
+fi
+
+echo "Network '$NETWORK' couldn't be toggled"
+exit 2

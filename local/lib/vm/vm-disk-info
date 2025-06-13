@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: disk info <disk-path>\nPrint the infos about the virtual disk"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+DISK_PATH="$1"
+
+if [[ ! -f "$DISK_PATH" ]]; then
+  echo "Error: File '$DISK_PATH' does not exist or is not a virtual disk file"
+  exit 2
+fi
+
+qemu-img info "$DISK_PATH"

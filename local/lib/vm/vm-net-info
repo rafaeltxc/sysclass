@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: net info <network>\nGet the infos about the specified alaready defined network"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+NETWORK="$1"
+
+virsh net-info "$NETWORK"

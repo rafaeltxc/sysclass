@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: create <path-to-xml>\nDefine a new VM from a XML"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+XML_FILE="$1"
+
+if [[ ! -f "$XML_FILE" ]]; then
+  echo "File '$XML_FILE' not found"
+  exit 2
+fi
+
+echo "Defining new VM from '$XML_FILE'..."
+if virsh define --file "$XML_FILE"; then
+  echo "VM defined successfully"
+  exit 0
+fi
+
+echo "Failed to define VM"
+exit 4

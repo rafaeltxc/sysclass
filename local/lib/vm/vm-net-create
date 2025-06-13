@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: net create <xml-path>\nDefines a new Network through virsh net"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+XML_FILE="$1"
+
+if [[ ! -f "$XML_FILE" ]]; then
+  echo "Error: XML File '$XML_FILE' not found"
+  exit 2
+fi
+
+echo "Validating XML..."
+if ! virt-xml-validate "$XML_FILE"; then
+  echo "Validation failed: XML does not conform to the expected schema"
+  exit 3
+fi
+
+echo "Defining network..."
+virsh net-define "$XML_FILE"
+
+if [[ $? -eq 0 ]]; then
+  echo "Network defined successfully from $XML_FILE"
+  echo "You may now run: 'vm net start <network-name>' and 'vm net autostart <network-name>'"
+  exit 0
+fi
+
+echo "Failed to define the new network from $XML_FILE"
+exit 3

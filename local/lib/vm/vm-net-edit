@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+msg="usage: net edit <network>\nEdit an already defined network"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$msg"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$msg"
+  exit 1
+fi
+
+NETWORK="$1"
+
+if ! virsh net-info "$NETWORK" &>/dev/null; then
+  echo "Network '$NETWORK' doesn't exist"
+  exit 2
+fi
+
+echo "Editing network '$NETWORK'..."
+virsh net-edit "$NETWORK"

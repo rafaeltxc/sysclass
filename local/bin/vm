@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# if [[ $EUID -ne 0 ]]; then
+#   echo "Command must be run as sudo"
+#   exit 1
+# fi
+
+VM_LIB_DIR="/usr/local/lib/vm"
+
+# Join args as command path
+if [[ $# -eq 0 ]]; then
+  echo "Usage: vm <command> [subcommand] [args...]"
+  exit 1
+fi
+
+for (( i=$#; i>0; i-- )); do
+  parts=("${@:1:$i}")
+  joined=$(IFS=-; echo "${parts[*]}")
+
+  candidate="$VM_LIB_DIR"/vm-"$joined"
+
+  if [[ -x "$candidate" ]]; then
+    arguments=("${@:i+1}")
+    exec "$candidate" "${arguments[@]}"
+  fi
+done
+
+echo "Unkonw command: $*"
+echo "Available commands"
+
+for f in "$VM_LIB_DIR"/vm-*; do
+  basename "$f" | sed 's/^vm-//' | tr '-' ' '
+done
+
+exit 1

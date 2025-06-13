@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+msg="usage: net destroy <network>\nShutdown (if running) and destroy an already defined network"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$msg"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$msg"
+  exit 1
+fi
+
+NETWORK="$1"
+
+if ! virsh net-info "$NETWORK" &>/dev/null; then
+  echo "Network '$NETWORK' doesn't exist"
+  exit 2
+fi
+
+if virsh net-info "$NETWORK" 2>/dev/null | grep -q "Active:. *yes"; then
+  echo "Shutting down active network '$NETWORK'..."
+  virsh net-destroy "$NETWORK"
+fi
+
+echo "Undefining network '$NETWORK'..."
+if virsh net-undefine "$NETWORK"; then
+  echo "Network '$NETWORK' destroyed successfully"
+  exit 0
+fi
+
+echo "Failed to destroy network '$NETWORK'"
+exit 2

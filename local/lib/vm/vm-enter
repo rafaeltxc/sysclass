@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: enter <vm-name>\nEnter the serial console of an already defined VM"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+VM_NAME="$1"
+
+echo "Connecting to VM's serial console..."
+virsh console "$VM_NAME"

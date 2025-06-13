@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: disk check <disk-path>\Check disk infos"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+DISK_PATH="$1"
+
+if [[ ! -f "$DISK_PATH" ]]; then
+  echo "Error: Disk '$DISK_PATH' not found"
+  exit 2
+fi
+
+echo "Running qemu-img check -r..."
+qemu-img check "$DISK_PATH"
+
+if [[ $? -eq 0 ]]; then
+  echo "Disk check completed"
+  exit 0
+fi
+
+echo "qemu-img check reported issues"
+exit 4

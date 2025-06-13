@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: disk convert <source-format> <output-format> <disk-path> <output-path>\nConvert the given disk to the desire destination and format\nFormats: vmdk, raw, qcow2, vdi, vpc"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 3 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+DEST_FORMAT="$1"
+SOURCE_PATH="$2"
+DEST_PATH="$3"
+
+if [[ "$DEST_FORMAT" != "vmdk" && "$DEST_FORMAT" != "raw" && "$DEST_FORMAT" != "qcow2" && "$DEST_FORMAT" != "vdi" && "$DEST_FORMAT" != "vpc" ]]; then
+  echo "Invalid format: $DEST_FORMAT"
+  echo "Valid options: vmdk, rawm, qcow2, vpc"
+  exit 3
+fi
+
+if [[ ! -f "$SOURCE_PATH" ]]; then
+  echo "Error: Source disk '$SOURCE_PATH' does not exist"
+  exit 2
+fi
+
+if [[ -e "$DEST_PATH" ]]; then
+  echo "Error: Destination '$DEST_PATH' already exist. Refusing to overwrite"
+  exit 3
+fi
+
+qemu-img convert -O "$DEST_FORMAT" "$SOURCE_PATH" "$DEST_PATH.$DEST_FORMAT"
+
+if [[ $? -eq 0 ]]; then
+  echo "Disk converted successfully to '$DEST_PATH' and format '$DEST_FORMAT'"
+  exit 0
+fi
+
+echo "Disk convert failed"
+exit 4

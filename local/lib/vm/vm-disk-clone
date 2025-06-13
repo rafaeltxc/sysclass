@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: disk clone <disk-path> <output-path>\nClone the given disk to the desire destination"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 2 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+SOURCE="$1"
+DEST="$2"
+
+if [[ ! -f "$SOURCE" ]]; then
+  echo "Error: Source disk '$SOURCE' does not exist"
+  exit 2
+fi
+
+if [[ -e "$DEST" ]]; then
+  echo "Error: Destination '$DEST' already exist. Refusing to overwrite"
+  exit 3
+fi
+
+qemu-img convert -O qcow2 "$SOURCE" "$DEST.qcow2"
+
+if [[ $? -eq 0 ]]; then
+  echo "Disk cloned successfully to '$DEST'"
+  exit 0
+fi
+
+echo "Disk cloning failed"
+exit 4

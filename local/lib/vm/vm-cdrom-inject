@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: cdrom inject <vm-name> <path-to-cdrom>\nInject CDROM into Live VM"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 2 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+VM_NAME="$1"
+CDROM_PATH="$2"
+
+if [[ ! -f "$CDROM_PATH" ]]; then
+  echo "Error: CDROM file '$CDROM_PATH' does not exist"
+  exit 1
+fi
+
+virsh change-media "$VM_NAME" hdc "$CDROM_PATH" --insert --live --config
+
+if [[ $? -eq 0 ]]; then
+  echo "Successfully inserted CDROM '$CDROM_PATH' into VM '$MV_NAME'"
+  exit 0
+fi
+
+echo "Failed to insert CDROM into VM"
+exit 3

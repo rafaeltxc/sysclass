@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: cdrom eject <vm-name>\nEject CDROM from Live VM"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+VM_NAME="$1"
+
+virsh change-media "$VM_NAME" hdc --eject --live --config
+
+if [[ $? -eq 0 ]]; then
+  echo "Successfully ejected CDROM from VM '$MV_NAME'"
+  exit 0
+fi
+
+echo "Failed to eject CDROM from VM"
+exit 3

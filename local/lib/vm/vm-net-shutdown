@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+msg="usage: net shutdown <network>\nShutdown an already defined and running network"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$msg"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$msg"
+  exit 1
+fi
+
+NETWORK="$1"
+
+if virsh net-info "$NETWORK" 2>/dev/null | grep -q "Active:. *no"; then
+  echo "Network '$NETWORK' is already inactive"
+  exit 0
+fi
+
+if virsh net-destroy "$NETWORK"; then
+  echo "Network '$NETWORK' shut down successfully"
+  exit 0
+fi
+
+echo "Failed to shut down network '$NETWORK'"
+exit 2

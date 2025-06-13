@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+MSG="Usage: net start <network>\nStart an already defined network"
+
+if [ "$1" = "help" ] || [ "$1" = "h" ]; then
+  echo -e "$MSG"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  echo -e "$MSG"
+  exit 1
+fi
+
+NETWORK="$1"
+
+if virsh net-info "$NETWORK" 2>/dev/null | grep -q "Active:. yes"; then
+  echo "Network '$NETWORK' is already active"
+  exit 0
+fi
+
+if virsh net-start "$NETWORK"; then
+  echo "Network '$NETWORK' started successfylly"
+  exit 0
+fi
+  
+echo "Failed to start network '$NETWORK'"
+exit 2
